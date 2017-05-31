@@ -5,7 +5,7 @@ from random import choice
 import sys 
 
 
-def open_and_read_file(file_path):
+def open_and_read_file(file_path1, file_path2):
     """Takes file path as string; returns text as string.
 
     Takes a string that is a file path, opens the file, and turns
@@ -13,9 +13,16 @@ def open_and_read_file(file_path):
     """
 
     # your code goes here
-    opened_file = open(file_path)
+    opened_file1 = open(file_path1)
+    opened_file2 = open(file_path2)
     # file_path.close()
-    return opened_file.read()
+    final_file = opened_file1.read() + opened_file2.read()
+
+    opened_file1.close()
+    opened_file2.close()
+
+    return final_file
+
 
 def make_chains(text_string, n_grams):
     """Takes input text as string; returns dictionary of markov chains.
@@ -60,13 +67,23 @@ def make_chains(text_string, n_grams):
 def make_text(chains, n_grams):
     """Returns text from chains."""
 
-    key_tuple = choice(chains.keys())
-    words = list(key_tuple)
+
+    while True:
+        key_tuple =choice(chains.keys())
+    
+        if key_tuple[0][0].isupper():   
+            words = list(key_tuple)
+            break
+        else:
+            continue    
 
     while True:
         if key_tuple in chains:
-            words.append(choice(chains[key_tuple]))
-            key_tuple = tuple(words[-n_grams:])
+            if key_tuple[-1][-1] in ('.', '!'):
+                break
+            else:
+                words.append(choice(chains[key_tuple]))
+                key_tuple = tuple(words[-n_grams:])
         else:
             break
 
@@ -77,17 +94,19 @@ def make_text(chains, n_grams):
     #return " ".join(words)
 
 
-input_path = sys.argv[1]
+input_path1 = sys.argv[2]
+input_path2 = sys.argv[3]
 
 # Open the file and turn it into one long string
-input_text = open_and_read_file(input_path)
+input_text = open_and_read_file(input_path1, input_path2)
 
 # Get a Markov chain
-chains = make_chains(input_text, 2)
+n_grams = int(sys.argv[1])
+chains = make_chains(input_text, n_grams)
 
 # print chains
 print
 # Produce random text
-random_text = make_text(chains, 2)
+random_text = make_text(chains, n_grams)
 
 print random_text
